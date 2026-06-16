@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { usePersona, Persona } from '@/context/PersonaContext';
 import { Menu, X, Download, ShieldCheck, Sparkles, Code, Cpu } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function Navbar() {
   const { persona, setPersona } = usePersona();
@@ -45,9 +46,9 @@ export default function Navbar() {
   ];
 
   const resumeLinks = [
-    { label: 'AI/ML Resume', file: '/resumes/UPPARA_VINOD_AI_ML.pdf' },
-    { label: 'Full Stack Resume', file: '/resumes/UPPARA_VINOD_FULL_STACK.pdf' },
-    { label: 'SDE Resume', file: '/resumes/UPPARA_VINOD_SDE.pdf' },
+    { label: 'AI/ML Resume', file: '/resumes/AI_ML.pdf' },
+    { label: 'Full Stack Resume', file: '/resumes/FULL_STACK.pdf' },
+    { label: 'SDE Resume', file: '/resumes/SDE.pdf' },
   ];
 
   return (
@@ -91,28 +92,42 @@ export default function Navbar() {
           </div>
 
           {/* Persona Switcher widget */}
-          <div className="hidden lg:flex items-center bg-gray-900/60 p-1 border border-white/5 rounded-full">
-            <button
-              onClick={() => setPersona('ai-ml')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full border transition-all cursor-pointer ${getActiveTabStyle('ai-ml', persona)}`}
-            >
-              <Cpu className="w-3.5 h-3.5" />
-              AI/ML
-            </button>
-            <button
-              onClick={() => setPersona('full-stack')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full border transition-all cursor-pointer ${getActiveTabStyle('full-stack', persona)}`}
-            >
-              <Code className="w-3.5 h-3.5" />
-              Full Stack
-            </button>
-            <button
-              onClick={() => setPersona('sde')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full border transition-all cursor-pointer ${getActiveTabStyle('sde', persona)}`}
-            >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              SDE
-            </button>
+          <div className="hidden lg:flex items-center bg-gray-900/60 p-1 border border-white/5 rounded-full relative">
+            {(['ai-ml', 'full-stack', 'sde'] as Persona[]).map((p) => {
+              const isActive = persona === p;
+              const label = p === 'ai-ml' ? 'AI/ML' : p === 'full-stack' ? 'Full Stack' : 'SDE';
+              const Icon = p === 'ai-ml' ? Cpu : p === 'full-stack' ? Code : ShieldCheck;
+              
+              const activeTextColor = 
+                p === 'ai-ml' ? 'text-cyan-400 font-bold' :
+                p === 'full-stack' ? 'text-rose-400 font-bold' :
+                'text-violet-400 font-bold';
+
+              const glowBgColor = 
+                p === 'ai-ml' ? 'bg-cyan-500/10 border-cyan-500/30 shadow-[0_0_15px_rgba(34,211,238,0.15)]' :
+                p === 'full-stack' ? 'bg-rose-500/10 border-rose-500/30 shadow-[0_0_15px_rgba(251,113,133,0.15)]' :
+                'bg-violet-500/10 border-violet-500/30 shadow-[0_0_15px_rgba(167,139,250,0.15)]';
+
+              return (
+                <button
+                  key={p}
+                  onClick={() => setPersona(p)}
+                  className={`relative flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full transition-colors duration-300 cursor-pointer ${
+                    isActive ? `${activeTextColor}` : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5 relative z-10" />
+                  <span className="relative z-10">{label}</span>
+                  {isActive && (
+                    <motion.span
+                      layoutId="activePersonaGlow"
+                      className={`absolute inset-0 rounded-full border ${glowBgColor} z-0`}
+                      transition={{ type: 'spring' as const, stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           {/* Resume Download Dropdown */}
@@ -146,28 +161,35 @@ export default function Navbar() {
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center gap-3">
             {/* Small screen persona toggler icon */}
-            <div className="flex bg-gray-900/60 p-0.5 border border-white/5 rounded-full">
-              <button
-                onClick={() => setPersona('ai-ml')}
-                className={`p-1.5 rounded-full transition-all ${persona === 'ai-ml' ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/20' : 'text-gray-500 border border-transparent'}`}
-                title="AI/ML Engineer Profile"
-              >
-                <Cpu className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => setPersona('full-stack')}
-                className={`p-1.5 rounded-full transition-all ${persona === 'full-stack' ? 'bg-rose-500/20 text-rose-400 border-rose-500/20' : 'text-gray-500 border border-transparent'}`}
-                title="Full Stack Developer Profile"
-              >
-                <Code className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => setPersona('sde')}
-                className={`p-1.5 rounded-full transition-all ${persona === 'sde' ? 'bg-violet-500/20 text-violet-400 border-violet-500/20' : 'text-gray-500 border border-transparent'}`}
-                title="Software Engineer Profile"
-              >
-                <ShieldCheck className="w-3.5 h-3.5" />
-              </button>
+            <div className="flex bg-gray-900/60 p-0.5 border border-white/5 rounded-full relative">
+              {(['ai-ml', 'full-stack', 'sde'] as Persona[]).map((p) => {
+                const isActive = persona === p;
+                const Icon = p === 'ai-ml' ? Cpu : p === 'full-stack' ? Code : ShieldCheck;
+                const activeColor = 
+                  p === 'ai-ml' ? 'text-cyan-400 bg-cyan-500/15 border-cyan-500/20' :
+                  p === 'full-stack' ? 'text-rose-400 bg-rose-500/15 border-rose-500/20' :
+                  'text-violet-400 bg-violet-500/15 border-violet-500/20';
+
+                return (
+                  <button
+                    key={p}
+                    onClick={() => setPersona(p)}
+                    className={`relative p-1.5 rounded-full transition-colors duration-300 z-10 ${
+                      isActive ? activeColor.split(' ')[0] : 'text-gray-500 hover:text-gray-300'
+                    }`}
+                    title={`${p.toUpperCase()} Profile`}
+                  >
+                    <Icon className="w-3.5 h-3.5 relative z-20" />
+                    {isActive && (
+                      <motion.span
+                        layoutId="activePersonaGlowMobile"
+                        className={`absolute inset-0 rounded-full border ${activeColor.split(' ').slice(1).join(' ')} z-0`}
+                        transition={{ type: "spring" as const, stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
             <button

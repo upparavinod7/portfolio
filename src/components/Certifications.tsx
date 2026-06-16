@@ -4,6 +4,30 @@ import React from 'react';
 import { usePersona } from '@/context/PersonaContext';
 import { educationData, certificationsData } from '@/data/portfolioData';
 import { GraduationCap, Award, BookOpen, ExternalLink, Calendar, CheckCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { y: 25, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: "spring" as const,
+      stiffness: 100,
+      damping: 15,
+    },
+  },
+};
 
 export default function Certifications() {
   const { persona } = usePersona();
@@ -18,9 +42,9 @@ export default function Certifications() {
 
   const getBorderColor = () => {
     switch (persona) {
-      case 'ai-ml': return 'border-cyan-500/20 hover:border-cyan-500/35 hover:bg-cyan-500/5';
-      case 'full-stack': return 'border-rose-500/20 hover:border-rose-500/35 hover:bg-rose-500/5';
-      case 'sde': return 'border-violet-500/20 hover:border-violet-500/35 hover:bg-violet-500/5';
+      case 'ai-ml': return 'border-cyan-500/20 hover:border-cyan-500/35 hover:bg-cyan-500/5 hover:shadow-[0_0_25px_rgba(6,182,212,0.15)]';
+      case 'full-stack': return 'border-rose-500/20 hover:border-rose-500/35 hover:bg-rose-500/5 hover:shadow-[0_0_25px_rgba(244,63,94,0.15)]';
+      case 'sde': return 'border-violet-500/20 hover:border-violet-500/35 hover:bg-violet-500/5 hover:shadow-[0_0_25px_rgba(139,92,246,0.15)]';
     }
   };
 
@@ -53,10 +77,17 @@ export default function Certifications() {
               }`}></div>
             </div>
 
-            <div className="space-y-6">
+            <motion.div 
+              className="space-y-6"
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+            >
               {educationData.map((edu, idx) => (
-                <div 
+                <motion.div 
                   key={idx} 
+                  variants={cardVariants}
                   className={`group relative glass-card p-6 rounded-2xl border border-white/5 transition-all ${getBorderColor()}`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
@@ -97,9 +128,9 @@ export default function Certifications() {
                     </div>
                   </div>
 
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
 
           </div>
 
@@ -117,10 +148,17 @@ export default function Certifications() {
               }`}></div>
             </div>
 
-            <div className="space-y-6">
+            <motion.div 
+              className="space-y-6"
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+            >
               {certificationsData.map((cert, idx) => (
-                <div 
+                <motion.div 
                   key={idx} 
+                  variants={cardVariants}
                   className={`group relative glass-card p-6 rounded-2xl border border-white/5 flex items-center justify-between gap-4 transition-all ${getBorderColor()}`}
                 >
                   <div className="flex items-start gap-4">
@@ -148,9 +186,9 @@ export default function Certifications() {
                     <ExternalLink className="w-4 h-4" />
                   </a>
 
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
 
           </div>
 

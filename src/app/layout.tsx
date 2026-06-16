@@ -1,19 +1,6 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { PersonaProvider } from "@/context/PersonaContext";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Uppara Vinod | AI/ML Engineer & Full Stack Developer Portfolio",
@@ -57,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} scroll-smooth dark`}>
+    <html lang="en" className="scroll-smooth dark">
       <body className="bg-gray-950 text-gray-100 antialiased selection:bg-purple-500 selection:text-white min-h-screen">
         <PersonaProvider>
           {children}

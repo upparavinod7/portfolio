@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import About from '@/components/About';
@@ -9,10 +9,13 @@ import Projects from '@/components/Projects';
 import Experience from '@/components/Experience';
 import Certifications from '@/components/Certifications';
 import Contact from '@/components/Contact';
+import LoadingScreen from '@/components/LoadingScreen';
 import { usePersona } from '@/context/PersonaContext';
+import { motion } from 'framer-motion';
 
 export default function Home() {
   const { persona } = usePersona();
+  const [isLoading, setIsLoading] = useState(true);
 
   // Dynamic decoration border color based on persona
   const getGlowBorder = () => {
@@ -23,50 +26,69 @@ export default function Home() {
     }
   };
 
+  const getAccentGlow = () => {
+    switch (persona) {
+      case 'ai-ml': return 'bg-cyan-500/5';
+      case 'full-stack': return 'bg-rose-500/5';
+      case 'sde': return 'bg-violet-500/5';
+    }
+  };
+
   return (
-    <div className="relative min-h-screen bg-gray-950 text-gray-100 flex flex-col font-sans overflow-x-hidden">
-      {/* Sticky Top Header */}
-      <Navbar />
+    <>
+      <LoadingScreen onComplete={() => setIsLoading(false)} />
+      
+      {!isLoading && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+          className="relative min-h-screen bg-[#02040a] text-gray-100 flex flex-col font-sans overflow-x-hidden"
+        >
+          {/* Sticky Top Header */}
+          <Navbar />
 
-      {/* Global Background Elements */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-30 z-0 pointer-events-none" />
-      <div className="absolute inset-0 bg-radial-glow z-0 pointer-events-none" />
+          {/* Global Background Elements */}
+          <div className="absolute inset-0 bg-grid-pattern opacity-25 z-0 pointer-events-none" />
+          <div className={`absolute inset-0 z-0 pointer-events-none transition-all duration-1000 ${getAccentGlow()} bg-radial-glow`} />
 
-      {/* Core Pages Components */}
-      <main className="flex-grow z-10 relative">
-        <Hero />
-        
-        {/* Dynamic transition divider line */}
-        <div className={`w-full h-[1px] bg-gradient-to-r ${getGlowBorder()}`} />
-        <About />
-        
-        <div className={`w-full h-[1px] bg-gradient-to-r ${getGlowBorder()}`} />
-        <Skills />
-        
-        <div className={`w-full h-[1px] bg-gradient-to-r ${getGlowBorder()}`} />
-        <Projects />
-        
-        <div className={`w-full h-[1px] bg-gradient-to-r ${getGlowBorder()}`} />
-        <Experience />
-        
-        <div className={`w-full h-[1px] bg-gradient-to-r ${getGlowBorder()}`} />
-        <Certifications />
-        
-        <div className={`w-full h-[1px] bg-gradient-to-r ${getGlowBorder()}`} />
-        <Contact />
-      </main>
+          {/* Core Pages Components */}
+          <main className="flex-grow z-10 relative">
+            <Hero />
+            
+            {/* Dynamic transition divider line */}
+            <div className={`w-full h-[1px] bg-gradient-to-r ${getGlowBorder()}`} />
+            <About />
+            
+            <div className={`w-full h-[1px] bg-gradient-to-r ${getGlowBorder()}`} />
+            <Skills />
+            
+            <div className={`w-full h-[1px] bg-gradient-to-r ${getGlowBorder()}`} />
+            <Projects />
+            
+            <div className={`w-full h-[1px] bg-gradient-to-r ${getGlowBorder()}`} />
+            <Experience />
+            
+            <div className={`w-full h-[1px] bg-gradient-to-r ${getGlowBorder()}`} />
+            <Certifications />
+            
+            <div className={`w-full h-[1px] bg-gradient-to-r ${getGlowBorder()}`} />
+            <Contact />
+          </main>
 
-      {/* Footer */}
-      <footer className="w-full py-8 border-t border-white/5 bg-gray-950 relative z-10 text-center text-xs text-gray-500 font-mono">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>Designed and engineered by Uppara Vinod.</p>
-          <div className="flex items-center gap-4">
-            <a href="#about" className="hover:text-white transition-colors">About</a>
-            <a href="#projects" className="hover:text-white transition-colors">Projects</a>
-            <a href="#contact" className="hover:text-white transition-colors">Contact</a>
-          </div>
-        </div>
-      </footer>
-    </div>
+          {/* Footer */}
+          <footer className="w-full py-8 border-t border-white/5 bg-gray-950 relative z-10 text-center text-xs text-gray-500 font-mono">
+            <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p>Designed and engineered by Uppara Vinod.</p>
+              <div className="flex items-center gap-4">
+                <a href="#about" className="hover:text-white transition-colors">About</a>
+                <a href="#projects" className="hover:text-white transition-colors">Projects</a>
+                <a href="#contact" className="hover:text-white transition-colors">Contact</a>
+              </div>
+            </div>
+          </footer>
+        </motion.div>
+      )}
+    </>
   );
 }

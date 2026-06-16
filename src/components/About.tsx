@@ -3,7 +3,8 @@
 import React from 'react';
 import { usePersona } from '@/context/PersonaContext';
 import { personalInfo } from '@/data/portfolioData';
-import { Award, FolderKanban, Briefcase, GraduationCap } from 'lucide-react';
+import { Award, FolderKanban, Briefcase, GraduationCap, ShieldAlert } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function About() {
   const { persona } = usePersona();
@@ -33,91 +34,194 @@ export default function About() {
     }
   };
 
+  const getGlowBorder = () => {
+    switch (persona) {
+      case 'ai-ml': return 'border-cyan-500/30 shadow-cyan-500/5 hover:border-cyan-500/65';
+      case 'full-stack': return 'border-rose-500/30 shadow-rose-500/5 hover:border-rose-500/65';
+      case 'sde': return 'border-violet-500/30 shadow-violet-500/5 hover:border-violet-500/65';
+    }
+  };
+
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, scale: 0.95, y: 20 },
+    visible: { 
+      opacity: 1, 
+      scale: 1, 
+      y: 0,
+      transition: { type: "spring" as const, stiffness: 80, damping: 15 }
+    }
+  };
+
   return (
-    <section id="about" className="py-24 relative overflow-hidden bg-gray-950">
+    <section id="about" className="py-24 relative overflow-hidden bg-[#02040a]">
+      {/* Decorative background grid element */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Section Heading */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-5xl font-display font-black text-white mb-4">
+        <div className="text-center mb-20">
+          <motion.h2 
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+            className="text-3xl sm:text-5xl font-display font-black text-white mb-4"
+          >
             About <span className={getGlowText()}>Me</span>
-          </h2>
-          <div className={`h-1.5 w-24 mx-auto rounded-full ${
-            persona === 'ai-ml' ? 'bg-cyan-500' :
-            persona === 'full-stack' ? 'bg-rose-500' :
-            'bg-violet-500'
-          }`}></div>
+          </motion.h2>
+          <motion.div 
+            initial={{ width: 0 }}
+            whileInView={{ width: 96 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className={`h-1.5 mx-auto rounded-full ${
+              persona === 'ai-ml' ? 'bg-cyan-500' :
+              persona === 'full-stack' ? 'bg-rose-500' :
+              'bg-violet-500'
+            }`}
+          ></motion.div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
-          {/* Visual Avatar Placeholder */}
+          {/* Visual Avatar Hologram HUD Card (Columns: 5) */}
           <div className="lg:col-span-5 flex justify-center">
-            <div className="relative group">
-              {/* Glow backdrop */}
-              <div className={`absolute -inset-1 rounded-2xl blur opacity-30 transition duration-1000 group-hover:opacity-50 ${
+            <motion.div 
+              initial={{ opacity: 0, rotateY: -15, x: -30 }}
+              whileInView={{ opacity: 1, rotateY: 0, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ type: "spring", stiffness: 60, damping: 18 }}
+              className="relative group perspective"
+            >
+              {/* Glow backdrop layer */}
+              <div className={`absolute -inset-1 rounded-2xl blur-lg opacity-25 group-hover:opacity-40 transition-all duration-1000 ${
                 persona === 'ai-ml' ? 'bg-cyan-500' :
                 persona === 'full-stack' ? 'bg-rose-500' :
                 'bg-violet-500'
               }`}></div>
               
-              {/* Inner Card */}
-              <div className="relative w-72 h-80 sm:w-80 sm:h-96 rounded-2xl glass-panel overflow-hidden border border-white/10 flex flex-col items-center justify-center p-6 text-center">
-                {/* Stylized SVG Avatar */}
-                <div className={`w-32 h-32 rounded-full flex items-center justify-center border-2 mb-6 ${
-                  persona === 'ai-ml' ? 'border-cyan-500/50 bg-cyan-500/5' :
-                  persona === 'full-stack' ? 'border-rose-500/50 bg-rose-500/5' :
-                  'border-violet-500/50 bg-violet-500/5'
-                }`}>
-                  <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
+              {/* Inner Cyber HUD Card */}
+              <div className={`relative w-72 h-[380px] sm:w-80 sm:h-[420px] rounded-2xl glassmorphism-hud p-6 flex flex-col items-center justify-between border transition-all duration-500 ${getGlowBorder()} cyber-scan-overlay`}>
+                
+                {/* HUD Top bar coordinates */}
+                <div className="w-full flex justify-between items-center text-[9px] font-mono text-gray-500 border-b border-white/5 pb-2">
+                  <span>SECURE_ID: #00997</span>
+                  <span>SYSTEM_LOAD: 0.12%</span>
+                </div>
+
+                {/* Cybernetic holographic rings avatar */}
+                <div className="relative w-36 h-36 flex items-center justify-center my-6">
+                  {/* Outer spinning dash ring */}
+                  <div className={`absolute inset-0 border border-dashed rounded-full animate-[spin_12s_linear_infinite] ${
+                    persona === 'ai-ml' ? 'border-cyan-500/40' :
+                    persona === 'full-stack' ? 'border-rose-500/40' :
+                    'border-violet-500/40'
+                  }`} />
+                  
+                  {/* Inner breathing ring */}
+                  <div className={`absolute inset-3 border rounded-full animate-pulse opacity-40 ${
+                    persona === 'ai-ml' ? 'border-cyan-400/30' :
+                    persona === 'full-stack' ? 'border-rose-400/30' :
+                    'border-violet-400/30'
+                  }`} />
+
+                  {/* SVG holographic avatar */}
+                  <div className={`w-24 h-24 rounded-full flex items-center justify-center border ${
+                    persona === 'ai-ml' ? 'border-cyan-500/30 bg-cyan-500/5 text-cyan-400' :
+                    persona === 'full-stack' ? 'border-rose-500/30 bg-rose-500/5 text-rose-400' :
+                    'border-violet-500/30 bg-violet-500/5 text-violet-400'
+                  }`}>
+                    <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
                 </div>
                 
-                <h3 className="font-display font-bold text-xl text-white mb-2">{personalInfo.name}</h3>
-                <p className="text-xs font-mono text-gray-400 mb-4">{currentPersonaInfo.tagline}</p>
-                <div className={`px-3 py-1 rounded-full text-[10px] font-mono border ${
-                  persona === 'ai-ml' ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400' :
-                  persona === 'full-stack' ? 'bg-rose-500/10 border-rose-500/30 text-rose-400' :
-                  'bg-violet-500/10 border-violet-500/30 text-violet-400'
-                }`}>
-                  Joy University CSE student
+                {/* Meta details */}
+                <div className="text-center w-full">
+                  <h3 className="font-display font-black text-xl text-white tracking-wide mb-1">{personalInfo.name}</h3>
+                  <p className="text-[10px] font-mono text-gray-400 mb-4 tracking-wider uppercase">{currentPersonaInfo.tagline}</p>
+                  
+                  {/* Digital status badge */}
+                  <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-mono border ${
+                    persona === 'ai-ml' ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400' :
+                    persona === 'full-stack' ? 'bg-rose-500/10 border-rose-500/30 text-rose-400' :
+                    'bg-violet-500/10 border-violet-500/30 text-violet-400'
+                  }`}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                    Joy University CSE student (9.45 CGPA)
+                  </div>
+                </div>
+
+                {/* HUD Bottom telemetry */}
+                <div className="w-full flex justify-between items-center text-[8px] font-mono text-gray-600 border-t border-white/5 pt-2">
+                  <span>COORD: 15.68 N / 77.28 E</span>
+                  <span>B.TECH CSE '27</span>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
 
-          {/* Narrative Journey & Stats */}
+          {/* Narrative Journey & Stats (Columns: 7) */}
           <div className="lg:col-span-7 flex flex-col justify-center">
-            <h3 className="text-xl sm:text-2xl font-display font-bold text-white mb-4">
+            <motion.h3 
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-2xl sm:text-3xl font-display font-black text-white mb-6 tracking-wide text-center lg:text-left"
+            >
               My Journey & Core Philosophy
-            </h3>
+            </motion.h3>
             
-            <p className="text-gray-300 font-sans leading-relaxed text-base sm:text-lg mb-8">
+            <motion.p 
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-gray-300 font-sans leading-relaxed text-sm sm:text-base mb-10 text-center lg:text-left"
+            >
               {currentPersonaInfo.bio}
-            </p>
+            </motion.p>
 
             {/* Quick Metrics Grid */}
-            <div className="grid grid-cols-2 gap-4">
+            <motion.div 
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              className="grid grid-cols-2 gap-4"
+            >
               {currentPersonaInfo.stats.map((stat, i) => (
-                <div 
+                <motion.div 
                   key={i} 
+                  variants={cardVariants}
                   className={`group relative glass-card p-5 rounded-xl border flex flex-col gap-3 transition-all ${
                     persona === 'ai-ml' ? 'hover:shadow-cyan-950/20 hover:border-cyan-500/35 hover:bg-cyan-500/5' :
                     persona === 'full-stack' ? 'hover:shadow-rose-950/20 hover:border-rose-500/35 hover:bg-rose-500/5' :
                     'hover:shadow-violet-950/20 hover:border-violet-500/35 hover:bg-violet-500/5'
                   }`}
                 >
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center border ${getAccentBorder()}`}>
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-all ${getAccentBorder()}`}>
                     {getIcon(stat.label)}
                   </div>
                   <div>
-                    <h4 className="font-display font-black text-2xl text-white tracking-tight">{stat.value}</h4>
-                    <p className="text-xs text-gray-400 mt-1 font-medium">{stat.label}</p>
+                    <h4 className="font-display font-black text-xl sm:text-2xl text-white tracking-tight">{stat.value}</h4>
+                    <p className="text-[10px] sm:text-xs text-gray-400 mt-1 font-mono tracking-wider uppercase">{stat.label}</p>
                   </div>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
 
           </div>
 
@@ -126,3 +230,4 @@ export default function About() {
     </section>
   );
 }
+

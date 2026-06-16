@@ -7,7 +7,7 @@ import { Mail, MapPin, Phone, Send, CheckCircle2, AlertCircle, Loader2 } from 'l
 
 export default function Contact() {
   const { persona } = usePersona();
-  
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -62,7 +62,7 @@ export default function Contact() {
     }
 
     setStatus('loading');
-    
+
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
@@ -86,21 +86,19 @@ export default function Contact() {
   return (
     <section id="contact" className="py-24 relative overflow-hidden bg-gray-900/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        {/* Section Heading */}
+
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-5xl font-display font-black text-white mb-4">
             Get In <span className={getGlowText()}>Touch</span>
           </h2>
-          <div className={`h-1.5 w-24 mx-auto rounded-full ${
-            persona === 'ai-ml' ? 'bg-cyan-500' :
-            persona === 'full-stack' ? 'bg-rose-500' :
-            'bg-violet-500'
-          }`}></div>
+          <div className={`h-1.5 w-24 mx-auto rounded-full ${persona === 'ai-ml' ? 'bg-cyan-500' :
+              persona === 'full-stack' ? 'bg-rose-500' :
+                'bg-violet-500'
+            }`}></div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 max-w-5xl mx-auto items-stretch">
-          
+
           {/* Contact Details Column */}
           <div className="lg:col-span-5 flex flex-col justify-between space-y-8">
             <div className="space-y-6">
@@ -114,7 +112,7 @@ export default function Contact() {
 
             {/* Info Items */}
             <div className="space-y-5">
-              
+
               {/* Email */}
               <div className="flex items-center gap-4 bg-gray-900/30 p-4 rounded-xl border border-white/5">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center border flex-shrink-0 ${getIconBorder()}`}>
@@ -163,7 +161,7 @@ export default function Contact() {
           {/* Form Column */}
           <div className="lg:col-span-7">
             <div className="glass-card p-6 sm:p-8 rounded-2xl border border-white/5">
-              
+
               {status === 'success' ? (
                 <div className="flex flex-col items-center text-center py-12 space-y-4">
                   <CheckCircle2 className="w-16 h-16 text-emerald-400 animate-bounce" />
@@ -171,7 +169,7 @@ export default function Contact() {
                   <p className="text-gray-400 text-sm max-w-sm">
                     Thank you for reaching out. I've received your message and will get back to you shortly at {personalInfo.email}.
                   </p>
-                  <button 
+                  <button
                     onClick={() => setStatus('idle')}
                     className={`mt-4 px-6 py-2 rounded-xl text-xs font-bold border border-white/10 text-white hover:bg-white/5 transition-colors cursor-pointer`}
                   >
@@ -180,11 +178,11 @@ export default function Contact() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
-                  
+
                   {/* Name field */}
                   <div className="space-y-2">
                     <label htmlFor="name" className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Name <span className="text-red-500">*</span></label>
-                    <input 
+                    <input
                       type="text"
                       id="name"
                       name="name"
@@ -199,7 +197,7 @@ export default function Contact() {
                   {/* Email field */}
                   <div className="space-y-2">
                     <label htmlFor="email" className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Email <span className="text-red-500">*</span></label>
-                    <input 
+                    <input
                       type="email"
                       id="email"
                       name="email"
@@ -214,7 +212,7 @@ export default function Contact() {
                   {/* Subject field */}
                   <div className="space-y-2">
                     <label htmlFor="subject" className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Subject</label>
-                    <input 
+                    <input
                       type="text"
                       id="subject"
                       name="subject"
@@ -228,7 +226,7 @@ export default function Contact() {
                   {/* Message field */}
                   <div className="space-y-2">
                     <label htmlFor="message" className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Message <span className="text-red-500">*</span></label>
-                    <textarea 
+                    <textarea
                       id="message"
                       name="message"
                       value={formData.message}
@@ -249,7 +247,7 @@ export default function Contact() {
                   )}
 
                   {/* Submit button */}
-                  <button 
+                  <button
                     type="submit"
                     disabled={status === 'loading'}
                     className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-xs font-bold tracking-wider uppercase transition-all shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${getAccentBtn()}`}
