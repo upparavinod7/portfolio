@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { usePersona } from "@/context/PersonaContext";
 import { personalInfo } from "@/data/portfolioData";
 import { ArrowRight, Download, Mail, MousePointer2, Sparkles } from "lucide-react";
-import AvatarCanvas from "./AvatarCanvas";
 import { motion } from "framer-motion";
 
 export default function Hero() {
@@ -101,10 +100,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative min-h-[100svh] overflow-hidden bg-[#02040a]">
-      <div className="absolute inset-0 z-0">
-        <AvatarCanvas />
-      </div>
+    <section id="hero" className="relative min-h-[100svh] overflow-hidden bg-transparent">
 
       <div className={`absolute inset-0 z-[1] bg-radial-glow opacity-90`} />
       <div className={`absolute inset-0 z-[1] bg-gradient-to-br ${accent.glow}`} />
@@ -169,30 +165,9 @@ export default function Hero() {
         </motion.div>
 
         <div className="grid gap-4 lg:grid-cols-[1fr_auto_1fr] lg:items-end">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.1, duration: 0.7 }}
-            className="hidden max-w-xs border border-white/10 bg-black/20 p-4 backdrop-blur-xl lg:block"
-          >
-            <div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">
-              <Sparkles className={`h-3.5 w-3.5 ${accent.text}`} />
-              Avatar response layer
-            </div>
-            <p className="text-xs leading-relaxed text-gray-300">
-              Cursor movement steers head, eyes, and reactive lighting. Click to trigger a gesture response.
-            </p>
-          </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.3, duration: 0.7 }}
-            className="mx-auto hidden items-center gap-2 border border-white/10 bg-black/25 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-gray-300 backdrop-blur-xl sm:flex"
-          >
-            <MousePointer2 className={`h-3.5 w-3.5 ${accent.text}`} />
-            Move cursor / scroll to shift scene
-          </motion.div>
+
+
 
           <motion.div
             initial={{ opacity: 0, y: 16 }}

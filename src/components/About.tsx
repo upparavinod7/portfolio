@@ -62,7 +62,7 @@ export default function About() {
   };
 
   return (
-    <section id="about" className="py-24 relative overflow-hidden bg-[#02040a]">
+    <section id="about" className="py-24 relative overflow-hidden bg-transparent">
       {/* Decorative background grid element */}
       <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
 
@@ -110,8 +110,8 @@ export default function About() {
                 'bg-violet-500'
               }`}></div>
               
-              {/* Inner Cyber HUD Card */}
-              <div className={`relative w-72 h-[380px] sm:w-80 sm:h-[420px] rounded-2xl glassmorphism-hud p-6 flex flex-col items-center justify-between border transition-all duration-500 ${getGlowBorder()} cyber-scan-overlay`}>
+              {/* Inner Cyber HUD Card with transparent background */}
+              <div className={`relative w-72 h-[380px] sm:w-80 sm:h-[420px] rounded-2xl glassmorphism-hud !bg-transparent p-6 flex flex-col items-center justify-between border transition-all duration-500 ${getGlowBorder()} cyber-scan-overlay`}>
                 
                 {/* HUD Top bar coordinates */}
                 <div className="w-full flex justify-between items-center text-[9px] font-mono text-gray-500 border-b border-white/5 pb-2">
@@ -119,32 +119,17 @@ export default function About() {
                   <span>SYSTEM_LOAD: 0.12%</span>
                 </div>
 
-                {/* Cybernetic holographic rings avatar */}
-                <div className="relative w-36 h-36 flex items-center justify-center my-6">
-                  {/* Outer spinning dash ring */}
-                  <div className={`absolute inset-0 border border-dashed rounded-full animate-[spin_12s_linear_infinite] ${
-                    persona === 'ai-ml' ? 'border-cyan-500/40' :
-                    persona === 'full-stack' ? 'border-rose-500/40' :
-                    'border-violet-500/40'
+                {/* 3D Holographic view spacer box */}
+                <div className="relative w-full flex-grow flex items-center justify-center my-4 min-h-[160px]">
+                  {/* Holographic scanner frames */}
+                  <div className={`absolute inset-4 border border-dashed rounded-xl animate-pulse opacity-30 ${
+                    persona === 'ai-ml' ? 'border-cyan-400' :
+                    persona === 'full-stack' ? 'border-rose-400' :
+                    'border-violet-400'
                   }`} />
-                  
-                  {/* Inner breathing ring */}
-                  <div className={`absolute inset-3 border rounded-full animate-pulse opacity-40 ${
-                    persona === 'ai-ml' ? 'border-cyan-400/30' :
-                    persona === 'full-stack' ? 'border-rose-400/30' :
-                    'border-violet-400/30'
-                  }`} />
-
-                  {/* SVG holographic avatar */}
-                  <div className={`w-24 h-24 rounded-full flex items-center justify-center border ${
-                    persona === 'ai-ml' ? 'border-cyan-500/30 bg-cyan-500/5 text-cyan-400' :
-                    persona === 'full-stack' ? 'border-rose-500/30 bg-rose-500/5 text-rose-400' :
-                    'border-violet-500/30 bg-violet-500/5 text-violet-400'
-                  }`}>
-                    <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  </div>
+                  <span className="text-[8px] font-mono tracking-widest text-gray-500 uppercase animate-pulse">
+                    TRACKING_TARGET_3D
+                  </span>
                 </div>
                 
                 {/* Meta details */}

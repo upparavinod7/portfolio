@@ -73,6 +73,9 @@ export default function Contact() {
       if (response.ok) {
         setStatus('success');
         setFormData({ name: '', email: '', subject: '', message: '' });
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("contact-success"));
+        }
       } else {
         const errData = await response.json();
         throw new Error(errData.error || 'Failed to submit form.');
@@ -84,7 +87,7 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="py-24 relative overflow-hidden bg-gray-900/40">
+    <section id="contact" className="py-24 relative overflow-hidden bg-transparent">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
         <div className="text-center mb-16">

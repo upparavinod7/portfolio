@@ -140,6 +140,13 @@ export default function Projects() {
   const [activeFilter, setActiveFilter] = useState<'all' | 'ai-ml' | 'full-stack' | 'sde'>('all');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
+  const handleSelectProject = (project: Project) => {
+    setSelectedProject(project);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("project-selected", { detail: project }));
+    }
+  };
+
   const filteredProjects = projectsData.filter(project => {
     if (activeFilter === 'all') return true;
     return project.category === activeFilter;
@@ -190,7 +197,7 @@ export default function Projects() {
   };
 
   return (
-    <section id="projects" className="py-24 relative overflow-hidden bg-[#02040a]">
+    <section id="projects" className="py-24 relative overflow-hidden bg-transparent">
       {/* Global design layouts */}
       <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
 
@@ -320,7 +327,7 @@ export default function Projects() {
               </div>
 
               <button
-                onClick={() => setSelectedProject(featuredProject)}
+                onClick={() => handleSelectProject(featuredProject)}
                 className={`mt-5 inline-flex w-full items-center justify-center gap-2 px-4 py-3 text-xs font-black uppercase tracking-wider transition ${
                   persona === 'ai-ml' ? 'bg-cyan-300 text-gray-950 hover:bg-cyan-200' :
                   persona === 'full-stack' ? 'bg-rose-400 text-gray-950 hover:bg-rose-300' :
@@ -341,7 +348,7 @@ export default function Projects() {
               key={project.id}
               project={project}
               persona={persona}
-              onDeepDive={() => setSelectedProject(project)}
+              onDeepDive={() => handleSelectProject(project)}
               getBadgeStyle={getBadgeStyle}
               getCategoryIcon={getCategoryIcon}
             />

@@ -10,6 +10,7 @@ import Experience from '@/components/Experience';
 import Certifications from '@/components/Certifications';
 import Contact from '@/components/Contact';
 import LoadingScreen from '@/components/LoadingScreen';
+import AvatarCanvas from '@/components/AvatarCanvas';
 import { usePersona } from '@/context/PersonaContext';
 import { motion } from 'framer-motion';
 
@@ -51,6 +52,11 @@ export default function Home() {
           {/* Global Background Elements */}
           <div className="absolute inset-0 bg-grid-pattern opacity-25 z-0 pointer-events-none" />
           <div className={`absolute inset-0 z-0 pointer-events-none transition-all duration-1000 ${getAccentGlow()} bg-radial-glow`} />
+
+          {/* Global Fixed 3D Avatar Canvas */}
+          <div className="fixed inset-0 z-0 w-full h-screen pointer-events-none">
+            <AvatarCanvas />
+          </div>
 
           {/* Core Pages Components */}
           <main className="flex-grow z-10 relative">

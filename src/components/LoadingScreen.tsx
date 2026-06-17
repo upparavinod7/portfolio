@@ -34,7 +34,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
           }, 600);
           return 100;
         }
-        
+
         // Dynamic increments for realistic cinematic look
         const increment = Math.floor(Math.random() * 12) + 4;
         return Math.min(prev + increment, 100);
@@ -58,32 +58,32 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
       {isVisible && (
         <motion.div
           initial={{ opacity: 1 }}
-          exit={{ 
+          exit={{
             opacity: 0,
             y: -100,
-            transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } 
+            transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
           }}
           className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#02040a] text-gray-100 overflow-hidden"
         >
           {/* Cyber grid background */}
           <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
-          
+
           {/* Subtle neon radial lighting */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-cyan-500/5 blur-3xl pointer-events-none" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-violet-500/5 blur-3xl pointer-events-none animate-pulse" />
 
           {/* Loading Container */}
           <div className="relative z-10 w-full max-w-md px-6 flex flex-col items-center">
-            
+
             {/* Pulsing Core Icon */}
-            <motion.div 
-              animate={{ 
+            <motion.div
+              animate={{
                 scale: [1, 1.05, 1],
-                rotate: [0, 90, 180, 270, 360] 
+                rotate: [0, 90, 180, 270, 360]
               }}
-              transition={{ 
+              transition={{
                 scale: { duration: 2, repeat: Infinity, ease: "easeInOut" },
-                rotate: { duration: 10, repeat: Infinity, ease: "linear" } 
+                rotate: { duration: 10, repeat: Infinity, ease: "linear" }
               }}
               className="w-16 h-16 rounded-xl border border-cyan-500/30 bg-cyan-500/5 flex items-center justify-center mb-8 text-cyan-400 shadow-[0_0_20px_-5px_rgba(6,182,212,0.3)]"
             >
@@ -95,7 +95,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
               SYSTEMS <span className="text-cyan-400">ONLINE</span>
             </h1>
             <p className="font-mono text-[10px] text-gray-500 tracking-wider mb-8 text-center uppercase">
-              Uppara Vinod // Core Terminal v16.2.7
+              Uppara Vinod
             </p>
 
             {/* Diagnostic Ticker */}
@@ -118,7 +118,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
 
             {/* Loading Bar */}
             <div className="w-full h-1.5 bg-gray-950 rounded-full overflow-hidden border border-white/5 p-[1px] mb-3">
-              <motion.div 
+              <motion.div
                 className="h-full bg-gradient-to-r from-cyan-500 via-indigo-500 to-violet-500 rounded-full"
                 style={{ width: `${progress}%` }}
                 layoutId="loadingProgress"

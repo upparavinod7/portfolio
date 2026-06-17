@@ -34,7 +34,7 @@ export default function Experience() {
   };
 
   return (
-    <section id="experience" className="py-24 relative overflow-hidden bg-gray-900/10">
+    <section id="experience" className="py-24 relative overflow-hidden bg-transparent">
       {/* Decorative background grid */}
       <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
 

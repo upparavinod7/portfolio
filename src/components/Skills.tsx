@@ -3,7 +3,6 @@
 import React from 'react';
 import { usePersona } from '@/context/PersonaContext';
 import { skillsData } from '@/data/portfolioData';
-import SkillSpheres from './SkillSpheres';
 import { motion } from 'framer-motion';
 
 export default function Skills() {
@@ -35,7 +34,7 @@ export default function Skills() {
   };
 
   return (
-    <section id="skills" className="py-24 relative overflow-hidden bg-gray-900/10">
+    <section id="skills" className="py-24 relative overflow-hidden bg-transparent">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
         {/* Section Heading */}
@@ -68,21 +67,25 @@ export default function Skills() {
         {/* Grid layout with 3D Orbiting Cloud + Progress Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          {/* LEFT: 3D skill orbit cloud (Columns: 5) */}
-          <div className="lg:col-span-5 flex flex-col items-center justify-center glass-panel p-6 rounded-2xl border border-white/5 relative bg-gray-950/60 shadow-2xl min-h-[380px] lg:min-h-[460px]">
+          {/* LEFT: Viewport frame for 3D avatar skills matrix (Columns: 5) */}
+          <div className="lg:col-span-5 flex flex-col items-center justify-center border border-white/5 rounded-2xl relative bg-transparent min-h-[380px] lg:min-h-[460px]">
             {/* Holographic scanner frames */}
             <div className="absolute top-3 left-3 text-[8px] font-mono text-gray-500 tracking-widest">3D_SKILL_MATRIX</div>
-            <div className="absolute top-3 right-3 text-[8px] font-mono text-gray-500 tracking-widest">ROTATION_ACTIVE</div>
+            <div className="absolute top-3 right-3 text-[8px] font-mono text-gray-500 tracking-widest">COMPILING_ACTIVE</div>
             
             <div className="absolute top-2 left-2 w-2 h-2 border-t border-l border-white/25" />
             <div className="absolute top-2 right-2 w-2 h-2 border-t border-r border-white/25" />
             <div className="absolute bottom-2 left-2 w-2 h-2 border-b border-l border-white/25" />
             <div className="absolute bottom-2 right-2 w-2 h-2 border-b border-r border-white/25" />
 
-            <SkillSpheres />
+            <div className="w-full flex-grow flex items-center justify-center">
+              <span className="text-[10px] text-gray-500 font-mono tracking-widest uppercase text-center max-w-[180px] leading-relaxed animate-pulse">
+                Interactive compiler console synced with digital representative
+              </span>
+            </div>
             
-            <p className="text-[10px] text-gray-500 font-mono text-center mt-2 max-w-xs leading-relaxed uppercase">
-              Hold cursor to pivot & inspect floating technology nodes.
+            <p className="text-[9px] text-gray-500 font-mono text-center mb-6 max-w-xs leading-relaxed uppercase">
+              Skills orbit active model coordinates in real time.
             </p>
           </div>
 
