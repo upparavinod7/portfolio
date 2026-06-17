@@ -11,13 +11,33 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [resumeDropdown, setResumeDropdown] = useState(false);
 
+  const [recruiterActive, setRecruiterActive] = useState(false);
+
+  const toggleRecruiter = () => {
+    const nextVal = !recruiterActive;
+    setRecruiterActive(nextVal);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("recruiter-mode-toggle", { detail: nextVal }));
+    }
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+
+    const handleRecruiterToggle = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      setRecruiterActive(customEvent.detail);
+    };
+    window.addEventListener("recruiter-mode-toggle", handleRecruiterToggle);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("recruiter-mode-toggle", handleRecruiterToggle);
+    };
+  }, [recruiterActive]);
 
   const getPersonaColor = (active: Persona) => {
     switch (active) {
@@ -130,6 +150,21 @@ export default function Navbar() {
             })}
           </div>
 
+          {/* Recruiter Mode Toggle */}
+          <div className="hidden md:block">
+            <button
+              onClick={toggleRecruiter}
+              className={`flex items-center gap-1.5 border px-4 py-2 rounded-full text-xs font-bold tracking-wider uppercase transition-all cursor-pointer ${
+                recruiterActive
+                  ? 'bg-cyan-500 border-cyan-400 text-black shadow-[0_0_15px_rgba(34,211,238,0.4)] animate-pulse'
+                  : 'text-gray-400 border-white/10 hover:text-white hover:border-white/25'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Recruiter Mode
+            </button>
+          </div>
+
           {/* Resume Download Dropdown */}
           <div className="hidden md:block relative">
             <button
@@ -216,6 +251,21 @@ export default function Navbar() {
               {item.label}
             </a>
           ))}
+          {/* Mobile Recruiter Mode Toggle */}
+          <div className="pt-2 pb-2 border-t border-white/5">
+            <button
+              onClick={() => { toggleRecruiter(); setIsOpen(false); }}
+              className={`w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-md text-sm font-bold tracking-wider uppercase transition-all cursor-pointer ${
+                recruiterActive
+                  ? 'bg-cyan-500 text-black font-extrabold shadow-[0_0_10px_rgba(34,211,238,0.3)]'
+                  : 'text-gray-300 hover:text-white hover:bg-gray-800'
+              }`}
+            >
+              <Sparkles className="w-4 h-4" />
+              Recruiter Mode
+            </button>
+          </div>
+
           <div className="pt-4 pb-2 border-t border-white/5">
             <p className="text-[10px] uppercase tracking-wider text-gray-500 px-3 mb-2">Download Resume Options</p>
             {resumeLinks.map((r) => (

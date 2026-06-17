@@ -71,7 +71,7 @@ function makeTextTexture(
   if (!ctx) return new THREE.CanvasTexture(canvas);
 
   ctx.clearRect(0, 0, width, height);
-  ctx.fillStyle = "rgba(2, 6, 16, 0.52)";
+  ctx.fillStyle = "rgba(2, 6, 16, 0.72)";
   ctx.fillRect(0, 0, width, height);
   ctx.strokeStyle = color;
   ctx.lineWidth = title ? 3 : 2;
@@ -84,7 +84,7 @@ function makeTextTexture(
   ctx.lineTo(width - 26, height - 34);
   ctx.stroke();
 
-  ctx.font = title ? "700 30px monospace" : "700 22px monospace";
+  ctx.font = title ? "700 24px monospace" : "700 18px monospace";
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
@@ -133,8 +133,11 @@ export default function AvatarCanvas() {
     const color = new THREE.Color(theme.primary);
     const secondary = new THREE.Color(theme.secondary);
 
+    const techTextures: THREE.Texture[] = [];
+    const hudMaterials: THREE.MeshBasicMaterial[] = [];
+    const panelMeshes: THREE.Mesh[] = [];
+
     const root = new THREE.Group();
-    // Default starting position
     root.position.set(1.5, -1.2, 0);
     scene.add(root);
 
@@ -150,46 +153,55 @@ export default function AvatarCanvas() {
     const techOrbit = new THREE.Group();
     root.add(techOrbit);
 
-    // Material system for personalized avatar
-    const matSkin = new THREE.MeshStandardMaterial({
-      color: 0xe8c1ac, // Lighter, whitish warm skin tone as requested by the user
-      roughness: 0.62,
-      metalness: 0.08,
+    const gitGrid = new THREE.Group();
+    root.add(gitGrid);
+
+    const resumeHolo = new THREE.Group();
+    root.add(resumeHolo);
+
+    // Realistic physical materials for premium digital human twin
+    const matSkin = new THREE.MeshPhysicalMaterial({
+      color: 0xebd2c4, // Natural warm whitish skin tone
+      roughness: 0.52,
+      metalness: 0.04,
+      clearcoat: 0.15,
+      clearcoatRoughness: 0.4,
     });
-    const matHoodie = new THREE.MeshStandardMaterial({
-      color: 0xd97706, // Camel/mustard hoodie
-      roughness: 0.82,
-      metalness: 0.05,
+    const matHoodie = new THREE.MeshPhysicalMaterial({
+      color: 0x111622, // Black techwear jacket base
+      roughness: 0.76,
+      metalness: 0.1,
+      clearcoat: 0.1,
     });
     const matJeans = new THREE.MeshStandardMaterial({
-      color: 0x2e5b88, // Blue jeans
+      color: 0x1e2e3f, // Deep indigo raw denim jeans
       roughness: 0.9,
       metalness: 0.05,
     });
     const matHair = new THREE.MeshStandardMaterial({
-      color: 0x121212, // Dark curly hair
-      roughness: 0.88,
+      color: 0x0a0807, // Realistic natural black/dark brown hair
+      roughness: 0.85,
       metalness: 0.05,
     });
     const matGlassesFrame = new THREE.MeshStandardMaterial({
-      color: 0x1f2937, // Black/dark grey frame
-      roughness: 0.35,
-      metalness: 0.4,
+      color: 0x0a0f18, // Matte black spectacles
+      roughness: 0.22,
+      metalness: 0.6,
     });
     const matGlassesLens = new THREE.MeshPhysicalMaterial({
-      color: 0x06b6d4, // Glowing cyan glass lens
+      color: 0x06b6d4, // Cyan glowing semi-transparent glass
       transparent: true,
-      opacity: 0.45,
-      roughness: 0.1,
+      opacity: 0.32,
+      roughness: 0.05,
       metalness: 0.1,
-      transmission: 0.5,
-      thickness: 0.15,
+      transmission: 0.75,
+      thickness: 0.12,
       emissive: new THREE.Color(0x06b6d4),
-      emissiveIntensity: 0.28,
+      emissiveIntensity: 0.18,
     });
     const matSneakers = new THREE.MeshStandardMaterial({
-      color: 0xf3f4f6, // White sneakers
-      roughness: 0.72,
+      color: 0xf9fafb, // White sneakers
+      roughness: 0.65,
       metalness: 0.1,
     });
     const matGlow = new THREE.MeshBasicMaterial({
@@ -211,20 +223,20 @@ export default function AvatarCanvas() {
       emissiveIntensity: 0.18,
     });
 
-    const ambient = new THREE.HemisphereLight(0xffffff, 0x02040a, 0.75);
+    const ambient = new THREE.HemisphereLight(0xffffff, 0x02040a, 0.82);
     scene.add(ambient);
 
-    const keyLight = new THREE.SpotLight(0xffffff, 80, 55, Math.PI / 6.5, 0.45, 1.2);
+    const keyLight = new THREE.SpotLight(0xffffff, 85, 55, Math.PI / 6.5, 0.45, 1.2);
     keyLight.position.set(-5, 11, 7);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.set(2048, 2048);
     scene.add(keyLight);
 
-    const rimLight = new THREE.PointLight(theme.secondary, 16, 28);
+    const rimLight = new THREE.PointLight(theme.secondary, 18, 28);
     rimLight.position.set(5, 3.2, -2);
     scene.add(rimLight);
 
-    const cursorLight = new THREE.PointLight(theme.primary, 20, 18);
+    const cursorLight = new THREE.PointLight(theme.primary, 22, 18);
     cursorLight.position.set(0, 2, 4);
     scene.add(cursorLight);
 
@@ -307,139 +319,152 @@ export default function AvatarCanvas() {
       return mesh;
     };
 
-    // Construct Hoodie Body
+    // Rebuild Premium Techwear Jacket (Cyberpunk AI aesthetic)
     addMesh(spine, new THREE.Mesh(new THREE.CapsuleGeometry(0.34, 0.62, 8, 18), matHoodie), 0.16);
-    const bodyMesh = addMesh(chest, new THREE.Mesh(new THREE.CapsuleGeometry(0.48, 0.66, 10, 24), matHoodie), 0.02);
+    const bodyMesh = addMesh(chest, new THREE.Mesh(new THREE.CapsuleGeometry(0.48, 0.66, 12, 24), matHoodie), 0.02);
     bodyMesh.scale.set(1.05, 1, 0.72);
 
-    // Hood attachment behind head
-    const hoodMesh = new THREE.Mesh(new THREE.SphereGeometry(0.44, 24, 24, 0, Math.PI * 2, 0, Math.PI * 0.78), matHoodie);
-    hoodMesh.position.set(0, 0.05, -0.12);
-    hoodMesh.rotation.x = 0.35;
-    chest.add(hoodMesh);
+    const techCollar = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.065, 8, 32), matHoodie);
+    techCollar.rotation.x = Math.PI / 2;
+    techCollar.position.set(0, 0.4, 0);
+    chest.add(techCollar);
 
-    // Drawstrings
-    const stringLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.28, 8), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8 }));
-    stringLeft.position.set(0.12, -0.22, 0.3);
-    stringLeft.rotation.z = -0.1;
-    chest.add(stringLeft);
+    const zipper = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.5, 8), matGlow);
+    zipper.position.set(0, 0.1, 0.36);
+    chest.add(zipper);
 
-    const stringRight = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.28, 8), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8 }));
-    stringRight.position.set(-0.12, -0.22, 0.3);
-    stringRight.rotation.z = 0.1;
-    chest.add(stringRight);
+    const techStrapL = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.36, 0.02), matGlassesFrame);
+    techStrapL.position.set(0.18, 0.12, 0.35);
+    techStrapL.rotation.z = -0.15;
+    chest.add(techStrapL);
 
-    const drawstringTipLeft = new THREE.Mesh(new THREE.SphereGeometry(0.02, 8, 8), matGlow);
-    drawstringTipLeft.position.set(0.14, -0.36, 0.3);
-    chest.add(drawstringTipLeft);
+    const techStrapR = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.36, 0.02), matGlassesFrame);
+    techStrapR.position.set(-0.18, 0.12, 0.35);
+    techStrapR.rotation.z = 0.15;
+    chest.add(techStrapR);
 
-    const drawstringTipRight = new THREE.Mesh(new THREE.SphereGeometry(0.02, 8, 8), matGlow);
-    drawstringTipRight.position.set(-0.14, -0.36, 0.3);
-    chest.add(drawstringTipRight);
+    // Custom deformed head representing realistic proportions
+    const headGeom = new THREE.SphereGeometry(0.38, 32, 32);
+    const posAttr = headGeom.attributes.position;
+    for (let i = 0; i < posAttr.count; i++) {
+      let x = posAttr.getX(i);
+      let y = posAttr.getY(i);
+      let z = posAttr.getZ(i);
 
-    // Custom head with whitish skin tone
-    const headMesh = addMesh(head, new THREE.Mesh(new THREE.SphereGeometry(0.38, 32, 28), matSkin), 0.03);
-    headMesh.scale.set(0.92, 1.12, 0.92);
+      if (y < 0) {
+        // Taper cheek and narrow jawline
+        posAttr.setX(i, x * (1 + y * 0.24));
+        posAttr.setY(i, y * 1.05); // elongate chin
+        if (z > 0) {
+          // Pull chin box slightly forward
+          posAttr.setZ(i, z + Math.pow(Math.abs(y), 2.0) * 0.15);
+        }
+      }
+      if (y > 0.02 && y < 0.16 && z > 0.22 && Math.abs(x) < 0.08) {
+        // defined realistic nose bridge displacement
+        posAttr.setZ(i, z + 0.055);
+      }
+      if (y > 0.05 && y < 0.18 && Math.abs(x) > 0.15 && z > 0.15) {
+        // cheekbone volume
+        posAttr.setZ(i, z + 0.016);
+      }
+    }
+    headGeom.computeVertexNormals();
+    const headMesh = addMesh(head, new THREE.Mesh(headGeom, matSkin), 0.03);
 
     // Nose
-    const nose = new THREE.Mesh(new THREE.CapsuleGeometry(0.045, 0.09, 8, 12), matSkin);
+    const nose = new THREE.Mesh(new THREE.CapsuleGeometry(0.042, 0.095, 8, 12), matSkin);
     nose.position.set(0, 0.04, 0.36);
-    nose.rotation.x = 0.1;
+    nose.rotation.x = 0.08;
     head.add(nose);
 
     // Ears
-    const earLeft = new THREE.Mesh(new THREE.SphereGeometry(0.065, 12, 12), matSkin);
-    earLeft.position.set(0.38, 0.02, -0.04);
-    earLeft.scale.set(0.6, 1, 1);
-    head.add(earLeft);
+    const earL = new THREE.Mesh(new THREE.SphereGeometry(0.065, 12, 12), matSkin);
+    earL.position.set(0.38, 0.02, -0.04);
+    earL.scale.set(0.55, 1, 0.9);
+    head.add(earL);
 
-    const earRight = new THREE.Mesh(new THREE.SphereGeometry(0.065, 12, 12), matSkin);
-    earRight.position.set(-0.38, 0.02, -0.04);
-    earRight.scale.set(0.6, 1, 1);
-    head.add(earRight);
+    const earR = new THREE.Mesh(new THREE.SphereGeometry(0.065, 12, 12), matSkin);
+    earR.position.set(-0.38, 0.02, -0.04);
+    earR.scale.set(0.55, 1, 0.9);
+    head.add(earR);
 
-    // Dark curly, voluminous hair (WhatsApp/Meta avatar style using procedural clumping spheres)
+    // Curly hair helical strands (3D corkscrews for professional organic representation)
     const hairGroup = new THREE.Group();
     head.add(hairGroup);
 
-    const hairPositions = [
-      // Top Crown
-      { x: 0, y: 0.38, z: 0, r: 0.16 },
-      { x: 0.12, y: 0.36, z: 0.1, r: 0.14 },
-      { x: -0.12, y: 0.36, z: 0.1, r: 0.14 },
-      { x: 0.12, y: 0.36, z: -0.1, r: 0.14 },
-      { x: -0.12, y: 0.36, z: -0.1, r: 0.14 },
-      { x: 0, y: 0.43, z: 0.05, r: 0.12 },
-      { x: 0.06, y: 0.43, z: -0.06, r: 0.12 },
-      { x: -0.06, y: 0.43, z: -0.06, r: 0.12 },
-      // Sides
-      { x: 0.28, y: 0.19, z: 0.05, r: 0.14 },
-      { x: 0.31, y: 0.1, z: 0, r: 0.12 },
-      { x: 0.28, y: 0.26, z: 0.08, r: 0.13 },
-      { x: 0.28, y: 0.26, z: -0.08, r: 0.13 },
-      { x: -0.28, y: 0.19, z: 0.05, r: 0.14 },
-      { x: -0.31, y: 0.1, z: 0, r: 0.12 },
-      { x: -0.28, y: 0.26, z: 0.08, r: 0.13 },
-      { x: -0.28, y: 0.26, z: -0.08, r: 0.13 },
-      // Back of head
-      { x: 0, y: 0.22, z: -0.28, r: 0.16 },
-      { x: 0.12, y: 0.18, z: -0.26, r: 0.14 },
-      { x: -0.12, y: 0.18, z: -0.26, r: 0.14 },
-      { x: 0.18, y: 0.28, z: -0.22, r: 0.15 },
-      { x: -0.18, y: 0.28, z: -0.22, r: 0.15 },
-      { x: 0, y: 0.32, z: -0.26, r: 0.16 },
-      { x: 0.1, y: 0.32, z: -0.24, r: 0.14 },
-      { x: -0.1, y: 0.32, z: -0.24, r: 0.14 },
-      { x: 0.22, y: 0.14, z: -0.18, r: 0.13 },
-      { x: -0.22, y: 0.14, z: -0.18, r: 0.13 },
-      // Front Voluminous Hairline (Fringe curly puffs)
-      { x: 0.15, y: 0.32, z: 0.22, r: 0.12 },
-      { x: -0.15, y: 0.32, z: 0.22, r: 0.12 },
-      { x: 0.0, y: 0.34, z: 0.25, r: 0.135 },
-      { x: 0.08, y: 0.36, z: 0.22, r: 0.12 },
-      { x: -0.08, y: 0.36, z: 0.22, r: 0.12 }
-    ];
+    const createHelicalPath = (start: THREE.Vector3, end: THREE.Vector3, radius: number, turns: number) => {
+      const points = [];
+      const segments = 12;
+      for (let i = 0; i <= segments; i++) {
+        const t = i / segments;
+        const pos = new THREE.Vector3().lerpVectors(start, end, t);
+        const angle = t * turns * Math.PI * 2;
+        pos.x += Math.cos(angle) * radius;
+        pos.z += Math.sin(angle) * radius;
+        points.push(pos);
+      }
+      return new THREE.CatmullRomCurve3(points);
+    };
 
-    hairPositions.forEach((pos) => {
-      const hairGeom = new THREE.SphereGeometry(pos.r, 8, 8);
-      const hairMesh = new THREE.Mesh(hairGeom, matHair);
-      hairMesh.position.set(pos.x, pos.y, pos.z);
-      const s = 0.95 + Math.random() * 0.15;
-      hairMesh.scale.set(s, s * 1.1, s);
-      hairMesh.castShadow = true;
-      hairGroup.add(hairMesh);
-    });
+    const makeCurl = (start: THREE.Vector3, end: THREE.Vector3, radius: number, turns: number, thickness = 0.018) => {
+      const curve = createHelicalPath(start, end, radius, turns);
+      const geom = new THREE.TubeGeometry(curve, 10, thickness, 4, false);
+      const mesh = new THREE.Mesh(geom, matHair);
+      mesh.castShadow = true;
+      hairGroup.add(mesh);
+    };
 
-    // Rectangular Glasses
+    const generateCurls = () => {
+      const scalpRadius = 0.355;
+      const numCurls = 42;
+      for (let i = 0; i < numCurls; i++) {
+        const phi = Math.acos(Math.random() * 0.78 + 0.12);
+        const theta = Math.random() * Math.PI * 2;
+        const start = new THREE.Vector3(
+          scalpRadius * Math.sin(phi) * Math.cos(theta),
+          scalpRadius * Math.cos(phi) + 0.05,
+          scalpRadius * Math.sin(phi) * Math.sin(theta)
+        );
+        const end = start.clone().multiplyScalar(1.18);
+        const curlRadius = 0.035 + Math.random() * 0.015;
+        const turns = 1.6 + Math.random() * 1.4;
+        const thickness = 0.014 + Math.random() * 0.008;
+        makeCurl(start, end, curlRadius, turns, thickness);
+      }
+    };
+    generateCurls();
+
+    // Glasses
     const glassesGroup = new THREE.Group();
     head.add(glassesGroup);
 
-    const glassesLeftFrame = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.16, 0.02), matGlassesFrame);
-    glassesLeftFrame.position.set(0.13, 0.08, 0.35);
+    const glFrameL = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.16, 0.02), matGlassesFrame);
+    glFrameL.position.set(0.13, 0.08, 0.35);
 
-    const glassesRightFrame = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.16, 0.02), matGlassesFrame);
-    glassesRightFrame.position.set(-0.13, 0.08, 0.35);
+    const glFrameR = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.16, 0.02), matGlassesFrame);
+    glFrameR.position.set(-0.13, 0.08, 0.35);
 
-    const glassesLeftLens = new THREE.Mesh(new THREE.BoxGeometry(0.21, 0.13, 0.015), matGlassesLens);
-    glassesLeftLens.position.set(0.13, 0.08, 0.355);
+    const glLensL = new THREE.Mesh(new THREE.BoxGeometry(0.21, 0.13, 0.015), matGlassesLens);
+    glLensL.position.set(0.13, 0.08, 0.355);
 
-    const glassesRightLens = new THREE.Mesh(new THREE.BoxGeometry(0.21, 0.13, 0.015), matGlassesLens);
-    glassesRightLens.position.set(-0.13, 0.08, 0.355);
+    const glLensR = new THREE.Mesh(new THREE.BoxGeometry(0.21, 0.13, 0.015), matGlassesLens);
+    glLensR.position.set(-0.13, 0.08, 0.355);
 
-    const glassesBridge = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.03, 0.02), matGlassesFrame);
-    glassesBridge.position.set(0, 0.08, 0.35);
+    const glBridge = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.03, 0.02), matGlassesFrame);
+    glBridge.position.set(0, 0.08, 0.35);
 
-    const glassesTempleLeft = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.02, 0.32), matGlassesFrame);
-    glassesTempleLeft.position.set(0.25, 0.08, 0.19);
-    glassesTempleLeft.rotation.y = 0.04;
+    const glTempleL = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.02, 0.32), matGlassesFrame);
+    glTempleL.position.set(0.25, 0.08, 0.19);
+    glTempleL.rotation.y = 0.04;
 
-    const glassesTempleRight = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.02, 0.32), matGlassesFrame);
-    glassesTempleRight.position.set(-0.25, 0.08, 0.19);
-    glassesTempleRight.rotation.y = -0.04;
+    const glTempleR = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.02, 0.32), matGlassesFrame);
+    glTempleR.position.set(-0.25, 0.08, 0.19);
+    glTempleR.rotation.y = -0.04;
 
-    glassesGroup.add(glassesLeftFrame, glassesRightFrame, glassesLeftLens, glassesRightLens, glassesBridge, glassesTempleLeft, glassesTempleRight);
+    glassesGroup.add(glFrameL, glFrameR, glLensL, glLensR, glBridge, glTempleL, glTempleR);
 
-    // Eyes with Blinking mechanics
+    // High Gloss Glinting Eyes
     const leftEye = new THREE.Group();
     leftEye.position.set(0.13, 0.08, 0.32);
     head.add(leftEye);
@@ -448,65 +473,65 @@ export default function AvatarCanvas() {
     rightEye.position.set(-0.13, 0.08, 0.32);
     head.add(rightEye);
 
-    const eyeWhiteLeft = new THREE.Mesh(new THREE.SphereGeometry(0.065, 16, 16), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1 }));
-    eyeWhiteLeft.scale.set(1.1, 1, 0.45);
-    leftEye.add(eyeWhiteLeft);
+    const eyeWhiteL = new THREE.Mesh(new THREE.SphereGeometry(0.065, 16, 16), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1 }));
+    eyeWhiteL.scale.set(1.1, 1, 0.45);
+    leftEye.add(eyeWhiteL);
 
-    const eyeWhiteRight = new THREE.Mesh(new THREE.SphereGeometry(0.065, 16, 16), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1 }));
-    eyeWhiteRight.scale.set(1.1, 1, 0.45);
-    rightEye.add(eyeWhiteRight);
+    const eyeWhiteR = new THREE.Mesh(new THREE.SphereGeometry(0.065, 16, 16), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1 }));
+    eyeWhiteR.scale.set(1.1, 1, 0.45);
+    rightEye.add(eyeWhiteR);
 
-    const pupilLeft = new THREE.Mesh(new THREE.SphereGeometry(0.038, 16, 16), new THREE.MeshStandardMaterial({ color: 0x110d0a, roughness: 0.2 }));
-    pupilLeft.position.set(0, 0, 0.045);
-    leftEye.add(pupilLeft);
+    const pupilL = new THREE.Mesh(new THREE.SphereGeometry(0.038, 16, 16), new THREE.MeshStandardMaterial({ color: 0x140c08, roughness: 0.2 }));
+    pupilL.position.set(0, 0, 0.045);
+    leftEye.add(pupilL);
 
-    const pupilRight = new THREE.Mesh(new THREE.SphereGeometry(0.038, 16, 16), new THREE.MeshStandardMaterial({ color: 0x110d0a, roughness: 0.2 }));
-    pupilRight.position.set(0, 0, 0.045);
-    rightEye.add(pupilRight);
+    const pupilR = new THREE.Mesh(new THREE.SphereGeometry(0.038, 16, 16), new THREE.MeshStandardMaterial({ color: 0x140c08, roughness: 0.2 }));
+    pupilR.position.set(0, 0, 0.045);
+    rightEye.add(pupilR);
 
     // Eyebrows
-    const eyebrowLeft = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.02, 0.02), matHair);
-    eyebrowLeft.position.set(0.13, 0.19, 0.33);
-    eyebrowLeft.rotation.z = 0.08;
-    head.add(eyebrowLeft);
+    const ebL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.025, 0.02), matHair);
+    ebL.position.set(0.13, 0.19, 0.33);
+    ebL.rotation.z = 0.06;
+    head.add(ebL);
 
-    const eyebrowRight = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.02, 0.02), matHair);
-    eyebrowRight.position.set(-0.13, 0.19, 0.33);
-    eyebrowRight.rotation.z = -0.08;
-    head.add(eyebrowRight);
+    const ebR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.025, 0.02), matHair);
+    ebR.position.set(-0.13, 0.19, 0.33);
+    ebR.rotation.z = -0.06;
+    head.add(ebR);
 
     // Smile & Mustache
     const smileGroup = new THREE.Group();
     jaw.add(smileGroup);
 
-    const lipColor = new THREE.MeshStandardMaterial({ color: 0xb55a4e, roughness: 0.5 });
-    const lipLeft = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.015, 0.015), lipColor);
-    lipLeft.position.set(0.05, -0.17, 0.35);
-    lipLeft.rotation.z = 0.18;
+    const lipColor = new THREE.MeshStandardMaterial({ color: 0xb2584d, roughness: 0.5 });
+    const lipL = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.015, 0.015), lipColor);
+    lipL.position.set(0.05, -0.17, 0.35);
+    lipL.rotation.z = 0.18;
 
-    const lipRight = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.015, 0.015), lipColor);
-    lipRight.position.set(-0.05, -0.17, 0.35);
-    lipRight.rotation.z = -0.18;
+    const lipR = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.015, 0.015), lipColor);
+    lipR.position.set(-0.05, -0.17, 0.35);
+    lipR.rotation.z = -0.18;
 
-    const lipCenter = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.015, 0.015), lipColor);
-    lipCenter.position.set(0, -0.185, 0.35);
+    const lipCtr = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.015, 0.015), lipColor);
+    lipCtr.position.set(0, -0.185, 0.35);
 
-    smileGroup.add(lipLeft, lipRight, lipCenter);
+    smileGroup.add(lipL, lipR, lipCtr);
 
     const mustacheGroup = new THREE.Group();
     jaw.add(mustacheGroup);
 
-    const mustacheLeft = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.025, 0.02), matHair);
-    mustacheLeft.position.set(0.05, -0.11, 0.355);
-    mustacheLeft.rotation.z = -0.12;
+    const mustL = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.025, 0.02), matHair);
+    mustL.position.set(0.05, -0.11, 0.355);
+    mustL.rotation.z = -0.12;
 
-    const mustacheRight = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.025, 0.02), matHair);
-    mustacheRight.position.set(-0.05, -0.11, 0.355);
-    mustacheRight.rotation.z = 0.12;
+    const mustR = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.025, 0.02), matHair);
+    mustR.position.set(-0.05, -0.11, 0.355);
+    mustR.rotation.z = 0.12;
 
-    mustacheGroup.add(mustacheLeft, mustacheRight);
+    mustacheGroup.add(mustL, mustR);
 
-    // Custom helper for limbs
+    // Custom limb helper
     const makeLimb = (parent: THREE.Group, length: number, radius: number, material: THREE.Material, jointMaterial: THREE.Material = matGlow) => {
       const mesh = new THREE.Mesh(new THREE.CapsuleGeometry(radius, length, 8, 16), material);
       mesh.position.y = -length / 2;
@@ -520,16 +545,14 @@ export default function AvatarCanvas() {
       }
     };
 
-    // Hoodie Sleeves
+    // Sleeve / Wrist / Hip / Leg mounts
     makeLimb(leftShoulder, 0.64, 0.09, matHoodie);
     makeLimb(rightShoulder, 0.64, 0.09, matHoodie);
     makeLimb(leftElbow, 0.58, 0.075, matHoodie);
     makeLimb(rightElbow, 0.58, 0.075, matHoodie);
-    // Skin Hands
     makeLimb(leftWrist, 0.16, 0.08, matSkin, matSkin);
     makeLimb(rightWrist, 0.16, 0.08, matSkin, matSkin);
 
-    // Jeans Legs
     makeLimb(leftHip, 0.82, 0.11, matJeans);
     makeLimb(rightHip, 0.82, 0.11, matJeans);
     makeLimb(leftKnee, 0.76, 0.095, matJeans);
@@ -544,30 +567,77 @@ export default function AvatarCanvas() {
     rightAnkle.position.y = -0.76;
     rightKnee.add(rightAnkle);
 
-    const shoeLeft = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.12, 0.28), matSneakers);
-    shoeLeft.position.set(0, -0.06, 0.06);
-    shoeLeft.castShadow = true;
-    leftAnkle.add(shoeLeft);
+    const shoeL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.12, 0.28), matSneakers);
+    shoeL.position.set(0, -0.06, 0.06);
+    shoeL.castShadow = true;
+    leftAnkle.add(shoeL);
 
-    const shoeRight = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.12, 0.28), matSneakers);
-    shoeRight.position.set(0, -0.06, 0.06);
-    shoeRight.castShadow = true;
-    rightAnkle.add(shoeRight);
+    const shoeR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.12, 0.28), matSneakers);
+    shoeR.position.set(0, -0.06, 0.06);
+    shoeR.castShadow = true;
+    rightAnkle.add(shoeR);
 
-    // Halo ring over head
+    // Floating 3D GitHub activity contribution grid (neon blocks)
+    const buildGitGrid = () => {
+      const size = 0.08;
+      const spacing = 0.115;
+      const cols = 7;
+      const rows = 5;
+      for (let c = 0; c < cols; c++) {
+        for (let r = 0; r < rows; r++) {
+          const density = Math.random();
+          let colorHex = 0x161b22; // empty
+          if (density > 0.8) colorHex = 0x39d353; // high commit
+          else if (density > 0.5) colorHex = 0x26a641;
+          else if (density > 0.2) colorHex = 0x0e4429;
+
+          const blockMat = new THREE.MeshStandardMaterial({
+            color: colorHex,
+            roughness: 0.1,
+            metalness: 0.8,
+            emissive: new THREE.Color(colorHex),
+            emissiveIntensity: colorHex !== 0x161b22 ? 0.45 : 0.02,
+          });
+          const block = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), blockMat);
+          block.position.set((c - cols / 2) * spacing, (r - rows / 2) * spacing, 0);
+          gitGrid.add(block);
+        }
+      }
+    };
+    buildGitGrid();
+    gitGrid.position.set(-1.8, 1.25, 0.4);
+
+    // Interactive holographic resume panel
+    const buildResumeHolo = () => {
+      const texture = makeTextTexture([
+        "UPPARA VINOD // AI_ENGINEER",
+        "GPA: 9.45/10 // Joy University",
+        "Intern: Hyperready (MERN + TS)",
+        "Intern: Unified Mentor (Flask+ML)",
+        "Leadership: ACM Vice Chairperson",
+        "AWS Cloud Solutions Architect Sim"
+      ], "#fcd34d", 512, 256);
+      techTextures.push(texture);
+      const material = new THREE.MeshBasicMaterial({
+        map: texture,
+        transparent: true,
+        opacity: 0.9,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+      hudMaterials.push(material);
+      const panel = new THREE.Mesh(new THREE.PlaneGeometry(2.3, 1.15), material);
+      resumeHolo.add(panel);
+    };
+    buildResumeHolo();
+    resumeHolo.position.set(1.8, 1.25, 0.4);
+
+    // Halo torus
     const halo = addMesh(head, new THREE.Mesh(new THREE.TorusGeometry(0.52, 0.012, 8, 72), matGlass), 0.02);
     halo.rotation.y = Math.PI / 2;
 
-    // Default positioning defaults
-    leftShoulder.rotation.z = -0.16;
-    rightShoulder.rotation.z = 0.16;
-    leftHip.rotation.z = 0.05;
-    rightHip.rotation.z = -0.05;
 
-    // Nameplate and floating dashboards
-    const techTextures: THREE.Texture[] = [];
-    const hudMaterials: THREE.MeshBasicMaterial[] = [];
-    const panelMeshes: THREE.Mesh[] = [];
 
     const makePanel = (lines: string[], pos: THREE.Vector3, size: [number, number], accent: string, title = false) => {
       const texture = makeTextTexture(lines, accent, title ? 700 : 512, title ? 180 : 192, title);
@@ -594,7 +664,7 @@ export default function AvatarCanvas() {
     makePanel(["PIPELINE_IN", codeSnippets[0]], new THREE.Vector3(-2.9, 1.35, 0.12), [1.65, 0.58], "#86efac");
     makePanel(["SYSTEM_LIVE", codeSnippets[2]], new THREE.Vector3(2.95, 1.28, 0.15), [1.65, 0.58], "#fcd34d");
 
-    // Orbiting tech skill nodes
+    // Orbiting tech nodes
     const makeTechNode = (label: string, index: number) => {
       const texture = makeTextTexture([label], "#ffffff", 256, 128, false);
       techTextures.push(texture);
@@ -619,7 +689,7 @@ export default function AvatarCanvas() {
 
     const techNodes = theme.stack.map(makeTechNode);
 
-    // Glowing main background scanning beam
+    // Scanner beam cylinder shader
     const beamUniforms = {
       time: { value: 0 },
       glowColor: { value: new THREE.Color(theme.primary) },
@@ -658,7 +728,7 @@ export default function AvatarCanvas() {
     beam.position.y = 4.7;
     scene.add(beam);
 
-    // Floating particles
+    // Particles
     const particleCount = 1100;
     const particleGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
@@ -682,7 +752,7 @@ export default function AvatarCanvas() {
     const particles = new THREE.Points(particleGeo, particleMat);
     scene.add(particles);
 
-    // Sci-fi environment frames
+    // Tunnel frame cylinders
     const tunnelMat = new THREE.MeshBasicMaterial({
       color: theme.secondary,
       transparent: true,
@@ -703,9 +773,10 @@ export default function AvatarCanvas() {
       scroll: 0, 
       activeSection: "hero", 
       sectionProgress: 0, 
-      expression: 0.4, 
+      expression: 0.45, 
       blink: 1, 
-      isCheering: false 
+      isCheering: false,
+      isRecruiterMode: false 
     };
 
     const onMouseMove = (event: MouseEvent) => {
@@ -714,8 +785,7 @@ export default function AvatarCanvas() {
     };
 
     const onPointerDown = () => {
-      // Small smile expression jump on click
-      gsap.to(state, { expression: 1.0, duration: 0.18, yoyo: true, repeat: 1, ease: "power2.out" });
+      gsap.to(state, { expression: 0.9, duration: 0.18, yoyo: true, repeat: 1, ease: "power2.out" });
     };
 
     const sections = ["hero", "about", "skills", "projects", "experience", "contact"];
@@ -725,7 +795,6 @@ export default function AvatarCanvas() {
       const max = Math.max(document.body.scrollHeight - window.innerHeight, 1);
       state.scroll = THREE.MathUtils.clamp(window.scrollY / max, 0, 1);
 
-      // Dynamically locate the active section based on scroll offsets
       let currentSection = "hero";
       let progress = 0;
       const vh = window.innerHeight;
@@ -734,7 +803,6 @@ export default function AvatarCanvas() {
         const el = sectionElements[i] || document.getElementById(sections[i]);
         if (el) {
           const rect = el.getBoundingClientRect();
-          // Active when spanning the middle line of the screen
           if (rect.top <= vh * 0.55 && rect.bottom >= vh * 0.45) {
             currentSection = sections[i];
             const height = rect.height || 1;
@@ -748,10 +816,10 @@ export default function AvatarCanvas() {
     };
 
     const onProjectSelected = () => {
-      gsap.to(state, { expression: 0.9, duration: 0.2, yoyo: true, repeat: 1 });
-      // Temporary pointing animation triggers on project selection
-      gsap.fromTo(leftShoulder.rotation, { x: 0, z: -0.2 }, { x: -0.4, z: -1.4, duration: 0.6, yoyo: true, repeat: 1, repeatDelay: 1.5 });
-      gsap.fromTo(leftElbow.rotation, { x: 0 }, { x: -0.65, duration: 0.6, yoyo: true, repeat: 1, repeatDelay: 1.5 });
+      gsap.to(state, { expression: 0.85, duration: 0.2, yoyo: true, repeat: 1 });
+      // Walk present point trigger
+      gsap.fromTo(leftShoulder.rotation, { x: 0, z: -0.2 }, { x: -0.4, z: -1.3, duration: 0.6, yoyo: true, repeat: 1, repeatDelay: 1.5 });
+      gsap.fromTo(leftElbow.rotation, { x: 0 }, { x: -0.55, duration: 0.6, yoyo: true, repeat: 1, repeatDelay: 1.5 });
     };
 
     const onContactSuccess = () => {
@@ -761,11 +829,32 @@ export default function AvatarCanvas() {
       }, 3500);
     };
 
+    const onRecruiterToggle = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      state.isRecruiterMode = customEvent.detail;
+    };
+
+    const onAiChatResponse = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const gesture = customEvent.detail; // 'nod', 'cheer', 'point'
+      if (gesture === "nod") {
+        gsap.to(head.rotation, { x: 0.22, duration: 0.18, yoyo: true, repeat: 3 });
+      } else if (gesture === "cheer") {
+        state.isCheering = true;
+        setTimeout(() => { state.isCheering = false; }, 3200);
+      } else if (gesture === "point") {
+        gsap.fromTo(leftShoulder.rotation, { x: 0, z: -0.2 }, { x: -0.35, z: -1.25, duration: 0.5, yoyo: true, repeat: 1, repeatDelay: 1.2 });
+        gsap.fromTo(leftElbow.rotation, { x: 0 }, { x: -0.5, duration: 0.5, yoyo: true, repeat: 1, repeatDelay: 1.2 });
+      }
+    };
+
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("pointerdown", onPointerDown);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("project-selected", onProjectSelected);
     window.addEventListener("contact-success", onContactSuccess);
+    window.addEventListener("recruiter-mode-toggle", onRecruiterToggle);
+    window.addEventListener("ai-chat-response", onAiChatResponse);
 
     const resizeObserver = new ResizeObserver(() => {
       const w = Math.max(container.clientWidth, 1);
@@ -800,10 +889,9 @@ export default function AvatarCanvas() {
       mouse.x += (mouse.tx - mouse.x) * 0.085;
       mouse.y += (mouse.ty - mouse.y) * 0.085;
 
-      // Natural breathing and blinking rates
       const breathe = Math.sin(elapsed * 1.55);
-      const eyeBlinkRate = elapsed % 4.0;
-      state.blink = (eyeBlinkRate < 0.15) ? 0.05 : 1.0;
+      const blinkTimer = elapsed % 4.2;
+      state.blink = (blinkTimer < 0.16) ? 0.05 : 1.0;
 
       leftEye.scale.y = state.blink;
       rightEye.scale.y = state.blink;
@@ -813,7 +901,6 @@ export default function AvatarCanvas() {
       cursorLight.position.set(mouse.x * 5.3, 2.1 + mouse.y * 3.6, 3.4);
       cursorLight.intensity = 18 + Math.abs(mouse.x) * 10 + Math.max(mouse.y, 0) * 6;
 
-      // Define target layout offsets for section storytelling
       let targetPos = new THREE.Vector3(1.5, -1.2, 0);
       let targetRotY = -0.3;
       
@@ -830,7 +917,6 @@ export default function AvatarCanvas() {
       let spinePos = new THREE.Vector3(0, 1.9, 0);
       let activeSmile = 0.45;
 
-      // Dynamic targets based on tracked section
       if (state.isCheering) {
         targetPos.set(0, -0.6, 2.5);
         targetRotY = 0;
@@ -840,12 +926,21 @@ export default function AvatarCanvas() {
         rightElbowRot.set(-0.35, 0, 0);
         headRot.set(-0.25, Math.sin(elapsed * 12) * 0.12, 0);
         activeSmile = 1.0;
+      } else if (state.isRecruiterMode) {
+        // Salute pose for Recruiter Mode
+        targetPos.set(1.5, -1.2, 0.5);
+        targetRotY = -0.35;
+        rightShoulderRot.set(0.65, 0.2, 1.6);
+        rightElbowRot.set(-1.8, 0, 0);
+        leftShoulderRot.set(0.1, 0, -0.2);
+        leftElbowRot.set(-0.25, 0, 0);
+        headRot.set(0.05, mouse.x * 0.2, 0);
+        activeSmile = 0.8;
       } else {
         switch (state.activeSection) {
           case "hero":
             targetPos.set(1.5, -1.2, 0);
             targetRotY = -0.3;
-            // Welcome wave for the first few seconds
             if (elapsed < 6.0 || state.scroll < 0.02) {
               rightShoulderRot.set(0, -0.15, 1.6 + Math.sin(elapsed * 6.5) * 0.25);
               rightElbowRot.set(-0.7, 0, 0);
@@ -860,7 +955,6 @@ export default function AvatarCanvas() {
           case "about":
             targetPos.set(-2.2, -1.2, 0.5);
             targetRotY = 0.5;
-            // Points to milestones on the right side
             rightShoulderRot.set(-0.18, -0.4, 1.1 + Math.sin(elapsed * 1.8) * 0.04);
             rightElbowRot.set(-0.35, 0, 0);
             leftShoulderRot.set(0, 0, -0.16 + Math.cos(elapsed * 1.2) * 0.03);
@@ -869,10 +963,8 @@ export default function AvatarCanvas() {
             break;
 
           case "skills":
-            // Stands inside holographic command desk
             targetPos.set(-1.8, -1.2, 0.8);
             targetRotY = 0.6;
-            // typing arms motion
             leftShoulderRot.set(-0.48 + Math.sin(elapsed * 3.5) * 0.06, 0.15, -0.2);
             leftElbowRot.set(-0.75 + Math.cos(elapsed * 4.2) * 0.08, 0, 0);
             rightShoulderRot.set(-0.48 + Math.cos(elapsed * 3.2) * 0.06, -0.15, 0.2);
@@ -882,10 +974,8 @@ export default function AvatarCanvas() {
             break;
 
           case "projects":
-            // Presents selected project
             targetPos.set(2.0, -1.2, 0.5);
             targetRotY = -0.6;
-            // Left arm presenting to the left
             leftShoulderRot.set(-0.25, 0.45, -1.15 + Math.sin(elapsed * 2.2) * 0.04);
             leftElbowRot.set(-0.35, 0, 0);
             rightShoulderRot.set(0, 0, 0.16 + Math.cos(elapsed * 1.3) * 0.03);
@@ -894,29 +984,26 @@ export default function AvatarCanvas() {
             break;
 
           case "experience":
-            // Walks down a pathway
             targetPos.set(2.0, -1.2, 0.2);
             targetRotY = 0;
-            const gait = Math.sin(elapsed * 9);
-            leftHipRot.set(gait * 0.42, 0, 0.05);
-            rightHipRot.set(-gait * 0.42, 0, -0.05);
-            leftKneeRot.set(Math.max(0, -gait * 0.35), 0, 0.08);
-            rightKneeRot.set(Math.max(0, gait * 0.35), 0, 0.08);
-            leftShoulderRot.set(-gait * 0.32, 0, -0.16);
-            rightShoulderRot.set(gait * 0.32, 0, 0.16);
+            const walkGait = Math.sin(elapsed * 9);
+            leftHipRot.set(walkGait * 0.42, 0, 0.05);
+            rightHipRot.set(-walkGait * 0.42, 0, -0.05);
+            leftKneeRot.set(Math.max(0, -walkGait * 0.35), 0, 0.08);
+            rightKneeRot.set(Math.max(0, walkGait * 0.35), 0, 0.08);
+            leftShoulderRot.set(-walkGait * 0.32, 0, -0.16);
+            rightShoulderRot.set(walkGait * 0.32, 0, 0.16);
             leftElbowRot.set(-0.15, 0, 0);
             rightElbowRot.set(-0.15, 0, 0);
-            spinePos.set(0, 1.9 + Math.abs(gait) * 0.04, 0);
+            spinePos.set(0, 1.9 + Math.abs(walkGait) * 0.04, 0);
             headRot.set(0.04, mouse.x * 0.15, 0);
             activeSmile = 0.38;
             break;
 
           case "contact":
-            // Leaned in close, welcomes visitor
             targetPos.set(0, -0.68, 2.5);
             targetRotY = 0;
             if (state.sectionProgress > 0.8) {
-              // Farewell wave at the very bottom
               rightShoulderRot.set(0, -0.15, 1.6 + Math.sin(elapsed * 7) * 0.25);
               rightElbowRot.set(-0.7, 0, 0);
               leftShoulderRot.set(0, 0, -0.16 + Math.cos(elapsed * 1.5) * 0.04);
@@ -932,14 +1019,12 @@ export default function AvatarCanvas() {
         }
       }
 
-      // Smooth camera tracks
       const scroll = state.scroll;
       camera.position.x += (mouse.x * 0.38 + Math.sin(scroll * Math.PI * 2) * 0.35 - camera.position.x) * 0.02;
       camera.position.y += (2.05 + scroll * 1.4 + mouse.y * 0.18 - camera.position.y) * 0.02;
       camera.position.z += (8.4 + scroll * 2.4 - camera.position.z) * 0.02;
       camera.lookAt(0, 1.95 + scroll * 0.35, 0);
 
-      // Smoothly interpolate poses using lerp
       root.position.lerp(targetPos, 0.04);
       root.rotation.y += (targetRotY - root.rotation.y) * 0.04;
 
@@ -969,10 +1054,9 @@ export default function AvatarCanvas() {
       spine.position.y += (spinePos.y - spine.position.y) * 0.04;
       state.expression += (activeSmile - state.expression) * 0.04;
 
-      // Animate facial shapes based on smile state
       smileGroup.scale.set(1 + (state.expression - 0.45) * 0.3, 1 + (state.expression - 0.45) * 0.15, 1);
       
-      // Update Orbiting skill matrix scale
+      // Orbiting skill matrix scale
       let targetOrbitScale = 0.1;
       if (state.activeSection === "skills") {
         targetOrbitScale = 1.0;
@@ -991,6 +1075,24 @@ export default function AvatarCanvas() {
         node.position.set(Math.cos(angle) * radius, 2.05 + Math.sin(angle * 1.4) * 0.46, Math.sin(angle) * radius);
         node.quaternion.copy(camera.quaternion);
       });
+
+      // Orbiting GitHub Contribution grid scale (active in skills / projects)
+      let targetGitScale = 0.01;
+      if (state.activeSection === "skills" || state.activeSection === "projects" || state.isRecruiterMode) {
+        targetGitScale = 1.0;
+      }
+      gitGrid.scale.setScalar(gitGrid.scale.x + (targetGitScale - gitGrid.scale.x) * 0.04);
+      gitGrid.rotation.y = elapsed * 0.18 + scroll * 0.6;
+      gitGrid.rotation.x = Math.sin(elapsed * 0.4) * 0.05;
+
+      // Holographic Resume scale (active in about / recruiter mode)
+      let targetResumeScale = 0.01;
+      if (state.activeSection === "about" || state.isRecruiterMode) {
+        targetResumeScale = 1.0;
+      }
+      resumeHolo.scale.setScalar(resumeHolo.scale.x + (targetResumeScale - resumeHolo.scale.x) * 0.04);
+      resumeHolo.quaternion.copy(camera.quaternion);
+      resumeHolo.position.y = 1.25 + Math.sin(elapsed * 1.2) * 0.03;
 
       // Update nameplate & panel opacity
       let targetHoloOpacity = (state.activeSection === "hero") ? 1.0 : 0;
@@ -1037,6 +1139,8 @@ export default function AvatarCanvas() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("project-selected", onProjectSelected);
       window.removeEventListener("contact-success", onContactSuccess);
+      window.removeEventListener("recruiter-mode-toggle", onRecruiterToggle);
+      window.removeEventListener("ai-chat-response", onAiChatResponse);
       resizeObserver.disconnect();
       if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement);
 
@@ -1052,5 +1156,5 @@ export default function AvatarCanvas() {
     };
   }, []);
 
-  return <div ref={containerRef} className="absolute inset-0 h-full w-full overflow-hidden" />;
+  return <div ref={containerRef} className="absolute inset-0 h-full w-full overflow-hidden animate-fade-in" />;
 }
